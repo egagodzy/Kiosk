@@ -241,6 +241,20 @@ async def change_page_dir(pagename: ChangePageDir):
             return {"ChangedSRC": get_page.pagesrc.replace(pagename.cureent_pagename, pagename.new_pagename)}
         else:
             return {"ChangedSRC": get_page.pagesrc.replace(pagename.cureent_pagename, pagename.new_pagename), "ChangedIconSRC": get_page.pageicon.replace(pagename.cureent_pagename, pagename.new_pagename)}
+    elif get_page.pagetype == 'PDF':
+        parent_dir = f"{Path.cwd()}/Front/public/"
+        directory_pdf = "pdf/"
+        path_pdf = f"{parent_dir}{directory_pdf}"
+        current_path_dir_page = f"{path_pdf}{pagename.cureent_pagename}"
+        new_path_dir_page = f"{path_pdf}{pagename.new_pagename}"
+        shutil.copytree(current_path_dir_page, new_path_dir_page)
+        shutil.rmtree(current_path_dir_page)
+        #print(f'EtoGetPage: {get_page.pagesrc.replace(pagename.cureent_pagename, pagename.new_pagename)}')
+        #print(f"ETO PAGEICON: {get_page.pageicon}")
+        if get_page.pageicon == '':
+            return {"ChangedSRC": get_page.pagesrc.replace(pagename.cureent_pagename, pagename.new_pagename)}
+        else:
+            return {"ChangedSRC": get_page.pagesrc.replace(pagename.cureent_pagename, pagename.new_pagename), "ChangedIconSRC": get_page.pageicon.replace(pagename.cureent_pagename, pagename.new_pagename)}
     elif get_page.pagetype == 'SimplePage':
         parent_dir = f"{Path.cwd()}/Front/public/"
         directory_sp = "simplepage/"
@@ -470,6 +484,23 @@ async def upload_icon(files: List[UploadFile] = File(), pagename: str = Form(), 
                     content = file.file.read()
                     await out_file.write(content)
                     return {"IconSRC": f'/video/{pagename}/icon/{file.filename}'}
+    elif pagetype == "PDF":
+        dir_pdf = f"{parent_dir}{directory_pdf}"
+        dir_new_icon = f"{dir_pdf}{pagename}/icon"
+        print(await aiofiles.os.path.exists(dir_pdf))
+        if await aiofiles.os.path.exists(dir_new_icon) == True:
+            for file in files:
+                async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                    content = file.file.read()
+                    await out_file.write(content)
+                    return {"IconSRC": f'/pdf/{pagename}/icon/{file.filename}'}
+        else:
+            await aiofiles.os.mkdir(dir_new_icon)
+            for file in files:
+                async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                    content = file.file.read()
+                    await out_file.write(content)
+                    return {"IconSRC": f'/pdf/{pagename}/icon/{file.filename}'}
     elif pagetype == "SimplePage":
         dir_sp = f"{parent_dir}{directory_sp}"
         dir_new_icon = f"{dir_sp}{pagename}/icon"
@@ -511,7 +542,7 @@ async def upload_icon(files: List[UploadFile] = File(), pagename: str = Form(), 
                             return {"IconSRC": f'/simplepage/{pagename}/icon/{file.filename}'}
         else:
             await aiofiles.os.mkdir(f"{parent_dir}{directory_sp}")
-            if await os.path.exists(f'{dir_sp}{pagename}') == True:
+            if await aiofiles.os.path.exists(f'{dir_sp}{pagename}') == True:
                 dir_new_icon = f"{dir_sp}{pagename}/icon"
                 print(await aiofiles.os.path.exists(dir_new_icon))
                 if await aiofiles.os.path.exists(dir_new_icon) == True:
@@ -546,6 +577,82 @@ async def upload_icon(files: List[UploadFile] = File(), pagename: str = Form(), 
                             content = file.file.read()
                             await out_file.write(content)
                             return {"IconSRC": f'/simplepage/{pagename}/icon/{file.filename}'}
+    elif pagetype == "Site":
+        dir_site = f"{parent_dir}{directory_site}"
+        dir_new_icon = f"{dir_site}{pagename}/icon"
+        print(await aiofiles.os.path.exists(dir_site))
+        if await aiofiles.os.path.exists(dir_site) == True:
+            if await aiofiles.os.path.exists(f'{dir_site}{pagename}') == True:
+                print(await aiofiles.os.path.exists(dir_new_icon))
+                if await aiofiles.os.path.exists(dir_new_icon) == True:
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
+                else:
+                    await aiofiles.os.mkdir(dir_new_icon)
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
+            else:
+                await aiofiles.os.mkdir(f'{dir_site}{pagename}')
+                if await aiofiles.os.path.exists(dir_new_icon) == True:
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
+                else:
+                    await aiofiles.os.mkdir(dir_new_icon)
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
+        else:
+            await aiofiles.os.mkdir(f"{parent_dir}{directory_site}")
+            if await aiofiles.os.path.exists(f'{dir_site}{pagename}') == True:
+                dir_new_icon = f"{dir_site}{pagename}/icon"
+                print(await aiofiles.os.path.exists(dir_new_icon))
+                if await aiofiles.os.path.exists(dir_new_icon) == True:
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
+                else:
+                    await aiofiles.os.mkdir(dir_new_icon)
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
+            else:
+                await aiofiles.os.mkdir(f'{dir_site}{pagename}')
+                if await aiofiles.os.path.exists(dir_new_icon) == True:
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
+                else:
+                    await aiofiles.os.mkdir(dir_new_icon)
+                    for file in files:
+                        print(file.filename)
+                        async with aiofiles.open(f'{dir_new_icon}/{file.filename}', 'wb') as out_file:
+                            content = file.file.read()
+                            await out_file.write(content)
+                            return {"IconSRC": f'/site/{pagename}/icon/{file.filename}'}
 
 
 @app.post("/delete_video/")
