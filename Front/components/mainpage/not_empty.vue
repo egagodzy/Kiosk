@@ -1,10 +1,10 @@
 <template>
-    <div class="fixed flex bottom-80 bg-blue-600 opacity-80 w-full h-[200px]">
-        <div class="flex flex-col w-full h-full bg-slate-400" v-for="button in buttons">
+    <div class="fixed z-50 flex flex-wrap bottom-80 opacity-80">
+        <div :class="CustomStyle" v-for="button in buttons">
             <div @click="GoToButton(button.pagename)"
-                class="flex flex-col w-1/6 cursor-pointer bg-orange-500 mx-auto my-auto hover:bg-slate-500">
-                <div class="flex mx-auto">{{ button.pagename }}</div>
-                <img class="flex mx-auto" :src="button.pageicon" />
+                class="flex flex-col w-full cursor-pointer bg-orange-500 mx-auto my-auto hover:bg-slate-500">
+                <div class="flex w-full h-full mx-auto">{{ button.pagename }}</div>
+                <img class="flex w-full h-full mx-auto" :src="button.pageicon" />
             </div>
         </div>
     </div>
@@ -34,7 +34,8 @@ export default {
         return {
             configPDF: '#toolbar=0&navpanes=0&scrollbar=0"',
             imgs: '',
-            buttons: []
+            buttons: [],
+            CustomStyle: 'flex flex-col mx-auto my-10 w-1/12 bg-slate-400'
         }
     },
     props: {
@@ -60,6 +61,11 @@ export default {
         if (this.getPageData.pagetype === 'Site') {
             navigateTo(this.getPageData.pagesrc, { external: true })
         } else {
+            if (this.getPageData.pagetype === 'Video' || this.getPageData.pagetype === 'SimplePage') {
+                this.CustomStyle = '"flex flex-col mx-auto my-10 w-1/5 bg-slate-400"'
+            } else {
+                this.CustomStyle = '"flex flex-col mx-auto my-10 w-1/12 bg-slate-400"'
+            }
             this.imgs = this.getPageData.pagesrc.split(',');
             console.log(this.imgs);
             console.log(this.getPageData.pagenav.split(','))
